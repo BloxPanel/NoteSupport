@@ -1,6 +1,8 @@
 name: Publish Static Site
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -9,9 +11,12 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -35,10 +40,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- site-dist; then
+
+          git add -A site-dist
+
+          if git diff --cached --quiet; then
             echo "No site-dist changes to publish."
             exit 0
           fi
-          git add site-dist
+
           git commit -m "Publish static site bundle"
           git push
