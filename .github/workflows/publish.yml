@@ -1,0 +1,44 @@
+name: Publish Static Site
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: npm run build
+
+      - name: Prepare site-dist directory
+        run: |
+          rm -rf site-dist
+          mkdir -p site-dist
+          cp -R dist/. site-dist/
+
+      - name: Commit generated files if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- site-dist; then
+            echo "No site-dist changes to publish."
+            exit 0
+          fi
+          git add site-dist
+          git commit -m "Publish static site bundle"
+          git push

@@ -1,0 +1,17 @@
+node_modules
+dist
+.vite
+.env
+.env.local
+.env.production
+.env.development
+.dev.vars
+.wrangler
+*.log
+.DS_Store
+coverage
+*.sqlite
+*.db
+*.db-journal
+*.bak
+/tmp
